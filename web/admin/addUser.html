@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>add user</title>
+
+        <!-- Bootstrap CSS -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            />
+
+        <link rel="stylesheet" href="../static/css/signup.css" type="text/css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <link rel="stylesheet" href="../static/css/admin/dashboard.css">
+
+    </head>
+
+    <body class="bg-light">
+         <!-- Sidebar -->
+       <div class="sidebar">
+            <img src="../static/pictures/logo.png" alt="Logo">
+            <a href="adminDashboard.html">Dashboard</a>
+            <a href="manageUsers.html">Manage Users</a>
+            <a href="adminManageFoods.html">Manage Food</a>
+            <a href="adminManageMeals.html">Manage Meal</a>
+            <a href="adminManageSchedules.html">Manage Schedules</a>
+            <a href="../index.html">Logout</a>
+
+        </div>
+        <div class="login-container">
+            <h2 class="text-center mb-4">Create New User</h2>
+
+            
+            <!-- Error Message -->
+            <div id="errorContainer" class="alert alert-danger" style="display: none;"></div>
+
+            <form id="signup-form" method="POST" action="createUser">
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Phone number</label>
+                    <input type="number" class="form-control" name="phone" required />
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" name="email" required />
+                </div>
+                <div class="mb-3">
+                    <label for="role" class="form-label">Role</label>
+                    <select class="form-control" name="role" required>
+                        <option value="administrator">Administrator</option>
+                        <option value="lecturer">Lecturer</option>
+                        <option value="assistant_lecturer">Assistant Lecturer</option>
+                        <option value="restaurant_manager">Restaurant Manager</option>
+                        <option value="food_distributor">Food Distributor</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Submit</button>
+            </form>
+        </div>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="../static/js/signup.js"></script>
+
+
+    </body>
+</html>

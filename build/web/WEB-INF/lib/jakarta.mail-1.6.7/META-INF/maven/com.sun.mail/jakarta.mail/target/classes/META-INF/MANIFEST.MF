@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1733396333986
+Build-Jdk-Spec: 17
+Bundle-Description: Jakarta Mail API
+Bundle-DocURL: http://www.oracle.com
+Bundle-License: http://www.eclipse.org/legal/epl-2.0, https://www.gnu.or
+ g/software/classpath/license.html, http://www.eclipse.org/org/documents
+ /edl-v10.php
+Bundle-ManifestVersion: 2
+Bundle-Name: Jakarta Mail API
+Bundle-SymbolicName: com.sun.mail.jakarta.mail
+Bundle-Vendor: Oracle
+Bundle-Version: 1.6.7
+Created-By: Apache Maven Bundle Plugin
+DynamicImport-Package: *
+Export-Package: 
+ com.sun.mail.handlers;version="1.6.7",
+ com.sun.mail.iap;version="1.6.7",
+ com.sun.mail.imap;version="1.6.7",
+ com.sun.mail.imap.protocol;version="1.6.7",
+ com.sun.mail.pop3;version="1.6.7",
+ com.sun.mail.smtp;version="1.6.7",
+ com.sun.mail.util;version="1.6.7",
+ com.sun.mail.util.logging;version="1.6.7"
+Import-Package: 
+ javax.activation,
+ javax.security.sasl;resolution:=optional,
+ sun.security.util;resolution:=optional
+Tool: Bnd-5.1.1.202006162103

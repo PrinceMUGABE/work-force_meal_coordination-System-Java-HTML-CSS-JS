@@ -1,0 +1,37 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: java.mail
+Bnd-LastModified: 1733396294602
+Build-Jdk: 17.0.10
+Built-By: princ
+Bundle-Description: JavaMail API
+Bundle-DocURL: http://www.oracle.com
+Bundle-License: https://javaee.github.io/javamail/LICENSE
+Bundle-ManifestVersion: 2
+Bundle-Name: JavaMail API
+Bundle-SymbolicName: com.sun.mail.javax.mail
+Bundle-Vendor: Oracle
+Bundle-Version: 1.6.2
+Created-By: Apache Maven Bundle Plugin
+DynamicImport-Package: *
+Export-Package: 
+ com.sun.mail.imap;version="1.6.2",
+ com.sun.mail.imap.protocol;version="1.6.2",
+ com.sun.mail.iap;version="1.6.2",
+ com.sun.mail.pop3;version="1.6.2",
+ com.sun.mail.smtp;version="1.6.2",
+ com.sun.mail.util;version="1.6.2",
+ com.sun.mail.util.logging;version="1.6.2",
+ com.sun.mail.handlers;version="1.6.2"
+Extension-Name: javax.mail
+Implementation-Title: javax.mail
+Implementation-Vendor: Oracle
+Implementation-Vendor-Id: com.sun
+Implementation-Version: 1.6.2
+Import-Package: 
+ javax.security.sasl;resolution:=optional,
+ sun.security.util;resolution:=optional
+Probe-Provider-XML-File-Names: META-INF/gfprobe-provider.xml
+Specification-Title: JavaMail(TM) API Design Specification
+Specification-Vendor: Oracle
+Specification-Version: 1.6
+Tool: Bnd-3.5.0.201709291849

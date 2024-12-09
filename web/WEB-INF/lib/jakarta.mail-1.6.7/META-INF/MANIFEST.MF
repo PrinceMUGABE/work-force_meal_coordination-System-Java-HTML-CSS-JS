@@ -1,0 +1,52 @@
+Manifest-Version: 1.0
+Created-By: Apache Maven Bundle Plugin
+Build-Jdk-Spec: 11
+Extension-Name: javax.mail
+Implementation-Title: javax.mail
+Implementation-Vendor: Oracle
+Implementation-Vendor-Id: com.sun
+Implementation-Version: 1.6.7
+Probe-Provider-XML-File-Names: META-INF/gfprobe-provider.xml
+Specification-Title: Jakarta Mail API Design Specification
+Specification-Vendor: Oracle
+Specification-Version: 1.6
+Bnd-LastModified: 1617870836844
+Bundle-Description: Jakarta Mail API
+Bundle-DocURL: http://www.oracle.com
+Bundle-License: http://www.eclipse.org/legal/epl-2.0, https://www.gnu.or
+ g/software/classpath/license.html, http://www.eclipse.org/org/documents
+ /edl-v10.php
+Bundle-ManifestVersion: 2
+Bundle-Name: Jakarta Mail API
+Bundle-SymbolicName: com.sun.mail.jakarta.mail
+Bundle-Vendor: Oracle
+Bundle-Version: 1.6.7
+DynamicImport-Package: *
+Export-Package: com.sun.mail.handlers;uses:="javax.activation";version="
+ 1.6.7",com.sun.mail.iap;uses:="com.sun.mail.util";version="1.6.7",com.s
+ un.mail.imap;uses:="com.sun.mail.iap,com.sun.mail.imap.protocol,com.sun
+ .mail.util,javax.activation,javax.mail,javax.mail.event,javax.mail.inte
+ rnet,javax.mail.search";version="1.6.7",com.sun.mail.imap.protocol;uses
+ :="com.sun.mail.iap,com.sun.mail.imap,com.sun.mail.util,javax.mail,java
+ x.mail.internet,javax.mail.search";version="1.6.7",com.sun.mail.pop3;us
+ es:="com.sun.mail.util,javax.mail,javax.mail.internet";version="1.6.7",
+ com.sun.mail.smtp;uses:="com.sun.mail.util,javax.mail,javax.mail.intern
+ et";version="1.6.7",com.sun.mail.util;uses:="javax.mail,javax.mail.inte
+ rnet,javax.net.ssl";version="1.6.7",com.sun.mail.util.logging;uses:="ja
+ vax.mail";version="1.6.7",javax.mail;uses:="javax.activation,javax.mail
+ .event,javax.mail.search";version="1.6",javax.mail.event;uses:="javax.m
+ ail";version="1.6",javax.mail.internet;uses:="javax.activation,javax.ma
+ il";version="1.6",javax.mail.search;uses:="javax.mail";version="1.6",ja
+ vax.mail.util;uses:="javax.activation,javax.mail.internet";version="1.6
+ "
+Import-Package: com.sun.mail.iap;version="[1.6,2)",com.sun.mail.imap;ver
+ sion="[1.6,2)",com.sun.mail.util;version="[1.6,2)",javax.activation,jav
+ ax.crypto,javax.crypto.spec,javax.mail;version="[1.6,2)",javax.mail.eve
+ nt;version="[1.6,2)",javax.mail.internet;version="[1.6,2)",javax.mail.s
+ earch;version="[1.6,2)",javax.mail.util;version="[1.6,2)",javax.net,jav
+ ax.net.ssl,javax.security.auth.callback,javax.security.auth.x500,javax.
+ security.sasl;resolution:=optional,javax.xml.transform,javax.xml.transf
+ orm.stream,sun.security.util;resolution:=optional
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+Tool: Bnd-5.1.1.202006162103
+

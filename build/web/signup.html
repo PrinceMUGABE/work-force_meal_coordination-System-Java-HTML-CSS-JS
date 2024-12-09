@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Signup</title>
+
+        <!-- Bootstrap CSS -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            />
+        <link rel="stylesheet" href="static/css/signup.css">
+        <link rel="stylesheet" href="static/css/index.css" type="text/css" />
+    </head>
+
+    <body class="bg-light">
+        <div class="login-container">
+            <h2 class="text-center mb-4">Create Account</h2>
+
+            
+            <!-- Error Message -->
+            <div id="errorContainer" class="alert alert-danger" style="display: none;"></div>
+
+            <form id="signup-form" method="POST" action="signup">
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Phone number</label>
+                    <input type="number" class="form-control" name="phone" required />
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" name="email" required />
+                </div>
+                <div class="mb-3">
+                    <label for="role" class="form-label">Role</label>
+                    <select class="form-control" name="role" required>
+                        <option value="administrator">Administrator</option>
+                        <option value="lecturer">Lecturer</option>
+                        <option value="assistant_lecturer">Assistant Lecturer</option>
+                        <option value="restaurant_manager">Restaurant Manager</option>
+                        <option value="food_distributor">Food Distributor</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+            </form>
+        </div>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="static/js/signup.js"></script>
+
+<!--         Internal JavaScript 
+        <script>
+           document.getElementById('signup-form').addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent default form submission
+
+    var formData = new FormData(this); // Collect form data
+
+    // Debugging: Log the form data
+    formData.forEach(function (value, key) {
+        console.log(key + ": " + value);
+    });
+
+    // Send the data to the backend via AJAX
+    fetch('signup', {
+        method: 'POST',
+        body: formData
+    })
+    .then(function (response) {
+        return response.json(); // Assuming the server returns a JSON response
+    })
+    .then(function (data) {
+        var errorMessage = document.getElementById('errorContainer');
+        if (data.error) {
+            // If there's an error, display it
+            errorMessage.textContent = data.error;
+            errorMessage.style.display = 'block'; // Show the error container
+        } else if (data.message) {
+            // If it's a success message, redirect the user to login page
+            window.location.href = '/login.html'; // Redirect to login page
+        }
+    })
+    .catch(function (error) {
+        console.error('Error:', error); // Log any errors
+    });
+});
+
+        </script>-->
+
+    </body>
+</html>

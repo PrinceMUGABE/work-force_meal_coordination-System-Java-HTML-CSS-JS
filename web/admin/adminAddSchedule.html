@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Meal Schedule</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        label { 
+            display: block; 
+            margin-top: 10px; 
+        }
+        select, input { 
+            width: 100%; 
+            padding: 8px; 
+            margin-top: 5px; 
+        }
+        #submitFeedback { 
+            margin-top: 15px; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Create Meal Schedule</h1>
+    <form id="mealScheduleForm" method="POST" action="/workforce_meal_coordination_system/restaurantManager/schedule/create">
+
+        <label for="mealSelect">Select Meal:</label>
+        <select id="mealSelect" name="meal" required>
+            <option value="">Choose a Meal</option>
+        </select>
+
+        <label for="foodSelect">Select Foods (Hold Ctrl/Command to select multiple):</label>
+        <select id="foodSelect" name="foods" multiple required>
+            <option value="">Choose Foods</option>
+        </select>
+
+        <button type="submit">Create Meal Schedule</button>
+    </form>
+
+    <div id="submitFeedback"></div>
+
+    <script>
+        const baseUrl = 'http://localhost:8080/workforce_meal_coordination_system/restaurantManager/';
+        console.log('Base URL:', baseUrl);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const mealSelect = document.getElementById('mealSelect');
+            const foodSelect = document.getElementById('foodSelect');
+            const form = document.getElementById('mealScheduleForm');
+            const submitFeedback = document.getElementById('submitFeedback');
+
+            const mealTypeMap = {
+                BREAKFAST: "BREAKFAST",
+                LUNCH: "LUNCH",
+                DINNER: "DINNER",
+                SNACK: "SNACK"
+            };
+
+            // Fetch meals dynamically and populate the select dropdown
+            const mealsUrl = `${baseUrl}/meal?action=getAll`;
+            console.log('Fetching meals from URL:', mealsUrl);
+            fetch(mealsUrl)
+                .then(response => response.json())
+                .then(meals => {
+                    console.log('Meals from Database:', meals);
+                    meals.forEach(meal => {
+                        const option = document.createElement('option');
+                        option.value = meal.type; // Map directly to server-recognized types
+                        option.textContent = meal.type;
+                        mealSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching meals:', error);
+                    submitFeedback.innerHTML = 
+                        `<p style="color: red;">Error Fetching Meals: ${error.message}</p>`;
+                });
+
+            // Fetch foods dynamically and populate the select dropdown
+            const foodsUrl = `${baseUrl}/food/list`;
+            console.log('Fetching foods from URL:', foodsUrl);
+            fetch(foodsUrl)
+                .then(response => response.json())
+                .then(foods => {
+                    console.log('Foods from Database:', foods);
+                    foods.forEach(food => {
+                        const option = document.createElement('option');
+                        option.value = food.id;
+                        option.textContent = `${food.name} (${food.amount})`;
+                        foodSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching foods:', error);
+                    submitFeedback.innerHTML = 
+                        `<p style="color: red;">Error Fetching Foods: ${error.message}</p>`;
+                });
+
+            form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const selectedFoodIds = Array.from(foodSelect.selectedOptions).map(option => option.value);
+    const selectedMealType = mealSelect.value;
+
+    console.log('Selected Meal Type:', selectedMealType);
+    console.log('Selected Food IDs:', selectedFoodIds);
+
+    if (!selectedMealType) {
+        submitFeedback.innerHTML = `<p style="color: red;">Please select a valid meal type.</p>`;
+        return;
+    }
+
+    if (selectedFoodIds.length === 0) {
+        submitFeedback.innerHTML = `<p style="color: red;">Please select at least one food item.</p>`;
+        return;
+    }
+
+    const mealTypeToIndex = {
+        "BREAKFAST": 0,
+        "LUNCH": 1,
+        "DINNER": 2,
+        "SNACK": 3
+    };
+
+    const payload = {
+        mealId: mealTypeToIndex[selectedMealType], // Convert to index
+        foodIds: selectedFoodIds
+    };
+
+    console.log('Submitting payload:', payload);
+
+    fetch('/workforce_meal_coordination_system/admin/schedule/create', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+})
+    .then(response => {
+        console.log('Response Status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Server Response:', data);
+        if (data.error) {
+            submitFeedback.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+        } else {
+            // Log JSON response to console
+            console.log('Schedule Created Successfully:', data);
+
+            // Navigate to manageSchedule.html
+            window.location.href = 'adminManageSchedules.html';
+        }
+    })
+    .catch(error => {
+        console.error('Unexpected error:', error);
+        submitFeedback.innerHTML = `<p style="color: red;">Unexpected Error</p>`;
+    });
+});
+
+            
+            
+        });
+    </script>
+</body>
+</html>

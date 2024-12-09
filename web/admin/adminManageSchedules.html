@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Manage Schedules</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <link rel="stylesheet" href="../static/css/admin/dashboard.css">
+
+        <style>
+            .action-icons {
+                cursor: pointer;
+                margin-right: 10px;
+                font-size: 20px;
+                transition: color 0.3s ease;
+            }
+            .action-icons:hover {
+                opacity: 0.7;
+            }
+            .action-icons.edit { color: blue; }
+            .action-icons.delete { color: red; }
+            .action-icons.view { color: green; }
+
+            .container {
+                width: 90%;
+                margin: 0 auto;
+            }
+
+            .foods-list {
+                max-width: 200px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="sidebar">
+            <img src="../static/pictures/logo.png" alt="Logo">
+          
+            <a href="manageUsers.html">Manage Users</a>
+            <a href="adminManageFoods.html">Manage Food</a>
+            <a href="adminManageMeals.html">Manage Meal</a>
+            <a href="adminManageSchedules.html">All Orders</a>
+            <a href="../index.html">Logout</a>
+
+        </div>
+        <div class="container mt-5">
+            <h1 class="text-center mb-4">Manage Schedules</h1>
+
+            <!-- Search and Create Schedule Section -->
+            <div class="d-flex justify-content-between mb-3">
+                <a href="adminAddSchedule.html" class="btn btn-primary">Create New Schedule</a>
+                <input id="searchInput" class="form-control" style="width: 300px;" placeholder="Search schedules">
+            </div>
+
+            <!-- Schedules Table -->
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Schedule ID</th>
+                        <th>Meal Type</th>
+                        <th>User Phone</th>
+                        <th>Total Amount</th>
+                        <th>Foods</th>
+                        <th>Creation Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="schedulesTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- View Schedule Modal -->
+        <div class="modal fade" id="viewScheduleModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Schedule Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="scheduleDetailsContent">
+                        <!-- Details will be dynamically populated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Edit Schedule Modal -->
+        <div class="modal fade" id="editScheduleModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Schedule</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editScheduleForm">
+                            <input type="hidden" id="editScheduleId">
+
+                            <div class="form-group">
+                                <label for="editMealType">Meal Type</label>
+                                <input type="text" id="editMealType" class="form-control" disabled="True" required>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editFoods">Foods</label>
+                                <select id="editFoods" class="form-control" multiple required>
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editTotalAmount">Total Amount</label>
+                                <input type="number" step="0.01" id="editTotalAmount" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editMealAmount">Meal Amount</label>
+                                <input type="number" step="0.01" id="editMealAmount" class="form-control" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
+
+        <script>
+  class ScheduleManager {
+    constructor() {
+        // Configuration
+        this.baseUrl = 'http://localhost:8080/workforce_meal_coordination_system/restaurantManager/schedule';
+        this.schedules = [];
+        // Bind methods to ensure correct context
+        this.fetchSchedules = this.fetchSchedules.bind(this);
+        this.displaySchedules = this.displaySchedules.bind(this);
+        this.filterSchedules = this.filterSchedules.bind(this);
+        this.setupEventListeners = this.setupEventListeners.bind(this);
+        // Initialize event listeners and fetch schedules
+        this.setupEventListeners();
+        this.setupEditFormSubmit();
+        this.fetchSchedules();
+    }
+
+    setupEventListeners() {
+        // Search input
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', this.filterSchedules);
+        }
+
+        // Delegate event listener for view, edit, and delete actions
+        const tableBody = document.getElementById('schedulesTableBody');
+        if (tableBody) {
+            tableBody.addEventListener('click', (event) => {
+                const target = event.target;
+                const scheduleId = target.getAttribute('data-id');
+                if (target.classList.contains('view')) {
+                    this.viewScheduleDetails(scheduleId);
+                } else if (target.classList.contains('edit')) {
+                    this.editSchedule(scheduleId);
+                } else if (target.classList.contains('delete')) {
+                    this.deleteSchedule(scheduleId);
+                }
+            });
+        }
+    }
+
+    displaySchedules(schedules) {
+        const tableBody = document.getElementById('schedulesTableBody');
+        if (!tableBody) {
+            console.error('Table body element not found!');
+            return;
+        }
+
+        // Clear existing rows
+        tableBody.innerHTML = '';
+
+        // Check if schedules is empty
+        if (!schedules || schedules.length === 0) {
+            const noDataRow = `
+                <tr>
+                    <td colspan="7" class="text-center">No schedules found</td>
+                </tr>
+            `;
+            tableBody.innerHTML = noDataRow;
+            return;
+        }
+
+        // Populate table with schedules
+        schedules.forEach((schedule) => {
+            const foodNames = schedule.foods
+                ? schedule.foods.map((f) => f.name).join(', ')
+                : 'N/A';
+
+            let creationDate = 'N/A';
+            if (schedule.creationDate?.date && schedule.creationDate?.time) {
+                try {
+                    const { year, month, day } = schedule.creationDate.date;
+                    const { hour, minute, second } = schedule.creationDate.time;
+                    const parsedDate = new Date(year, month - 1, day, hour, minute, second);
+                    creationDate = parsedDate.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                    });
+                } catch (e) {
+                    console.error('Error while parsing creationDate:', e);
+                }
+            }
+
+            const row = `
+                <tr>
+                    <td>${schedule.id || 'N/A'}</td>
+                    <td>${schedule.mealType || 'N/A'}</td>
+                    <td>${schedule.user?.phone || 'N/A'}</td>
+                    <td>${schedule.totalAmount?.toFixed(2) || 'N/A'}</td>
+                    <td class="foods-list" title="${foodNames}">${foodNames}</td>
+                    <td>${creationDate}</td>
+                    <td>
+
+                        <i class="fas fa-edit action-icons edit" data-id="${schedule.id}"></i>
+                        <i class="fas fa-trash action-icons delete" data-id="${schedule.id}"></i>
+                    </td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    filterSchedules(event) {
+        const searchTerm = event.target.value.toLowerCase();
+        const filteredSchedules = this.schedules.filter(schedule =>
+            schedule.mealType.toLowerCase().includes(searchTerm) ||
+            (schedule.user && schedule.user.phone.includes(searchTerm)) ||
+            (schedule.foods && schedule.foods.some(food =>
+                food.name.toLowerCase().includes(searchTerm)
+            ))
+        );
+        this.displaySchedules(filteredSchedules);
+    }
+
+    viewScheduleDetails(scheduleId) {
+        const schedule = this.schedules.find(s => s.id == scheduleId);
+        if (!schedule) {
+            alert('Schedule not found');
+            return;
+        }
+
+        const foodsList = schedule.foods ?
+            schedule.foods.map(food => `
+                <li>${food.name} - Amount: ${food.amount.toFixed(2)}</li>
+            `).join('') : 'No foods';
+
+        const detailsContent = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Schedule Information</h5>
+                    <p><strong>Schedule ID:</strong> ${schedule.id}</p>
+                    <p><strong>Meal Type:</strong> ${schedule.mealType}</p>
+                    <p><strong>Total Amount:</strong> ${schedule.totalAmount.toFixed(2)}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>User Details</h5>
+                    <p><strong>Email:</strong> ${schedule.user ? schedule.user.email : 'N/A'}</p>
+                    <p><strong>Phone:</strong> ${schedule.user ? schedule.user.phone : 'N/A'}</p>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h5>Foods in Schedule</h5>
+                    <ul>
+                        ${foodsList}
+                    </ul>
+                </div>
+            </div>
+        `;
+        $('#scheduleDetailsContent').html(detailsContent);
+        $('#viewScheduleModal').modal('show');
+    }
+
+    editSchedule(scheduleId) {
+        const schedule = this.schedules.find(s => s.id == scheduleId);
+        if (!schedule) {
+            alert('Schedule not found');
+            return;
+        }
+
+        document.getElementById('editScheduleId').value = schedule.id;
+        document.getElementById('editMealType').value = schedule.mealType || 'BREAKFAST';
+        document.getElementById('editTotalAmount').value = schedule.totalAmount || 0;
+        document.getElementById('editMealAmount').value = schedule.mealAmount || 0;
+        this.populateFoodsDropdown();
+
+        setTimeout(() => {
+            const foodSelect = document.getElementById('editFoods');
+            const selectedFoods = schedule.foods.map(food => food.id);
+            Array.from(foodSelect.options).forEach(option => {
+                option.selected = selectedFoods.includes(parseInt(option.value));
+            });
+        }, 500);
+
+        $('#editScheduleModal').modal('show');
+    }
+
+    deleteSchedule(scheduleId) {
+        if (!confirm('Are you sure you want to delete this schedule?')) return;
+
+        fetch(`${this.baseUrl}/delete/${scheduleId}`, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to delete schedule');
+            this.schedules = this.schedules.filter(s => s.id != scheduleId);
+            this.displaySchedules(this.schedules);
+            alert('Schedule deleted successfully');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(error.message || 'Failed to delete schedule');
+        });
+    }
+
+    populateFoodsDropdown() {
+        const foodSelect = document.getElementById('editFoods');
+        foodSelect.innerHTML = '';
+
+        fetch(`${this.baseUrl.replace('schedule', 'food')}/list`)
+            .then(response => response.json())
+            .then(foods => {
+                foods.forEach(food => {
+                    const option = document.createElement('option');
+                    option.value = food.id;
+                    option.textContent = `${food.name} (${food.amount})`;
+                    foodSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching foods:', error);
+                alert(`Error fetching foods: ${error.message}`);
+            });
+    }
+
+    setupEditFormSubmit() {
+        const editForm = document.getElementById('editScheduleForm');
+        editForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const scheduleId = document.getElementById('editScheduleId').value;
+            const mealType = document.getElementById('editMealType').value;
+            const totalAmount = parseFloat(document.getElementById('editTotalAmount').value);
+            const mealAmount = parseFloat(document.getElementById('editMealAmount').value);
+            const selectedFoods = Array.from(document.getElementById('editFoods').selectedOptions)
+                .map(option => ({ id: parseInt(option.value) }));
+
+            const updatedSchedule = {
+                scheduleId: parseInt(scheduleId),
+                mealId: this.getMealTypeIndex(mealType),
+                totalAmount: totalAmount,
+                mealAmount: mealAmount,
+                foodIds: selectedFoods.map(food => food.id)
+            };
+
+            try {
+                const response = await fetch(`${this.baseUrl}/update/${scheduleId}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedSchedule)
+                });
+                if (!response.ok) throw new Error('Failed to update schedule');
+
+                const updatedScheduleData = await response.json();
+                const index = this.schedules.findIndex(s => s.id === updatedScheduleData.id);
+                if (index !== -1) {
+                    this.schedules[index] = updatedScheduleData;
+                }
+                $('#editScheduleModal').modal('hide');
+                this.displaySchedules(this.schedules);
+                alert('Schedule updated successfully');
+            } catch (error) {
+                console.error('Error updating schedule:', error);
+                alert(error.message);
+            }
+        });
+    }
+
+    getMealTypeIndex(mealType) {
+        const mealTypes = ['BREAKFAST', 'LUNCH', 'DINNER'];
+        return mealTypes.indexOf(mealType.toUpperCase());
+    }
+
+    fetchSchedules() {
+        fetch(`${this.baseUrl}/list`)
+            .then(response => response.json())
+            .then(schedules => {
+                this.schedules = schedules;
+                this.displaySchedules(this.schedules);
+            })
+            .catch(error => {
+                console.error('Error fetching schedules:', error);
+                alert(`Error fetching schedules: ${error.message}`);
+            });
+    }
+}
+
+// Initialize the ScheduleManager when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    new ScheduleManager();
+});
+
+        </script>
+    </body>
+</html>
